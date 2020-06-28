@@ -384,7 +384,6 @@ int mysql_conn() {
 			return mysqlLibrary;	//fail init
 
 		/*try to connect*/
-		//err_mess(GetActiveWindow(), "Try to connect");
 
 		for (retryAttempt = 1; retryAttempt <= limitConnect; retryAttempt++) { 
 			*status = 0;
@@ -396,7 +395,7 @@ int mysql_conn() {
 			strcopy(status, itoc(limitConnect));
 			SendMessage(status_bar, SB_SETTEXT, 2, (LPARAM)status);
 			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, (unsigned int *)&timeout);
-			if (mysql_real_connect(&conn, "95.28.93.38"/*"192.168.8.152"*/, "test", "testpass", "test_mac", 3306, NULL, 0) != NULL) {
+			if (mysql_real_connect(&conn, "95.28.93.38"/*"192.168.8.152"*/, "plc_admin", "97SxFt6U", "test_mac", 3306, NULL, 0) != NULL) {
 				break;
 			}
 		}

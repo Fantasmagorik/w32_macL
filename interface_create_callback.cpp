@@ -278,7 +278,8 @@ LRESULT CALLBACK groupWND_PROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
 
 	case WM_NOTIFY: {
-		//err_mess(hwnd, "12");
+		if(hwnd == registrationForm_editLogin_HWND)
+			err_mess(hwnd, "12");
 		break;
 	}
 	case WM_PAINT: {
@@ -739,7 +740,7 @@ struct selectedGroup *deviceView_getSelectedGroup(void) {
 	return sg;
 }
 
-LRESULT CALLBACK deviceSelect_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
+LRESULT CALLBACK deviceSelect_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) { 
 	const char st[] = u8"unicode string";
 	HTREEITEM ht, gt;
 	HWND curHWND;
@@ -768,15 +769,15 @@ LRESULT CALLBACK deviceSelect_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 		deviceSelect_treeView_HWND = CreateWindowEx(WS_EX_STATICEDGE, WC_TREEVIEW, "обзор", WS_VISIBLE + WS_CHILD /*+ WS_BORDER */ + TVS_HASLINES + TVS_HASBUTTONS + TVS_LINESATROOT + TVS_SHOWSELALWAYS,
 			20, 120, 400, 400, hwnd, deviceSelect_treeView_id, hinst, 0);
 
-		deviceSelect_listView_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE /*+ WS_BORDER */ + LVS_REPORT + LVS_SHOWSELALWAYS + LVS_SINGLESEL, 420, 120, 600, 400, hwnd, (HMENU)deviceSelect_listView_id, hinst, 0);
+		deviceSelect_listView_HWND		= CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE /*+ WS_BORDER */ + LVS_REPORT + LVS_SHOWSELALWAYS + LVS_SINGLESEL, 420, 120, 600, 400, hwnd, (HMENU)deviceSelect_listView_id, hinst, 0);
 		ListView_SetExtendedListViewStyle(deviceSelect_listView_HWND, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
-		deviceSelect_search_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 420, 75, 200, 25, hwnd, deviceSelect_search_id, hinst, 0);
-		deviceSelect_currentGroup_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "Текущая группа", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER*/ + ES_READONLY, 20, 45, 390, 25, hwnd, deviceSelect_currentGroup_id, hinst, 0);
+		deviceSelect_search_HWND		= CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 420, 75, 200, 25, hwnd, deviceSelect_search_id, hinst, 0);
+		deviceSelect_currentGroup_HWND	= CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "Текущая группа", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER*/ + ES_READONLY, 20, 45, 390, 25, hwnd, deviceSelect_currentGroup_id, hinst, 0);
 		deviceSelect_currentDevice_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "Текущее устройство", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER*/ + ES_READONLY, 20, 75, 390, 25, hwnd, deviceSelect_currentDevice_id, hinst, 0);
-		deviceSelect_btnChange_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Подробнее", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 870, 575, 150, 30, hwnd, deviceSelect_btnChange_id, hinst, 0);
-		deviceSelect_btnDelete_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Удалить", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 700, 575, 150, 30, hwnd, deviceSelect_btnDelete_id, hinst, 0);
-		deviceSelect_btnAdd_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Добавить", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 560, 575, 150, 30, hwnd, deviceSelect_btnAdd_id, hinst, 0);
-		deviceSelect_showOnlyMAC_HWND = CreateWindowEx(0, "button", "Только с MAC", /*BS_CENTER + BS_VCENTER + */ BS_RIGHTBUTTON + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 700, 75, 160, 25, hwnd, deviceSelect_showOnlyMAC_id, hinst, 0);
+		deviceSelect_btnChange_HWND		= CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Подробнее", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 870, 575, 150, 30, hwnd, deviceSelect_btnChange_id, hinst, 0);
+		deviceSelect_btnDelete_HWND		= CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Удалить", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 700, 575, 150, 30, hwnd, deviceSelect_btnDelete_id, hinst, 0);
+		deviceSelect_btnAdd_HWND		= CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Добавить", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 560, 575, 150, 30, hwnd, deviceSelect_btnAdd_id, hinst, 0);
+		deviceSelect_showOnlyMAC_HWND	= CreateWindowEx(0, "button", "Только с MAC", /*BS_CENTER + BS_VCENTER + */ BS_RIGHTBUTTON + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 700, 75, 160, 25, hwnd, deviceSelect_showOnlyMAC_id, hinst, 0);
 		CreateWindowEx(WS_EX_STATICEDGE, "button", "Готово", ES_CENTER + WS_VISIBLE + WS_CHILD/* + WS_BORDER/*+ ES_READONLY*/, 880, 75, 140, 30, hwnd, deviceSelect_btnClose_id, hinst, 0);
 
 		lv.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -1010,6 +1011,8 @@ void enterCatch(HWND hwnd) {
 		SetFocus(groupView_search_HWND);
 		SendMessage(groupView_search_HWND, EM_SETSEL, 0, MAKELPARAM(0, -1));
 	}
+	else if (hwnd == registrationForm_editPassword_HWND)
+		SendMessage(registrationForm_HWND, WM_COMMAND, MAKEWPARAM(registrationForm_btnOK_id, 0), MAKELPARAM(0, 0));
 
 	//else if(hwnd == )
 }
@@ -1240,8 +1243,11 @@ LRESULT CALLBACK registrationForm_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 			//err_mess(hwnd, itoc(SendMessage(registrationForm_editLogin_HWND, CB_GETCURSEL, 0, 0)));
 			i = SendMessage(registrationForm_editLogin_HWND, CB_GETCURSEL, 0, 0);
 			id = SendMessage(registrationForm_editLogin_HWND, CB_GETITEMDATA, i, 0);
-			if (mysql_checkUser(id, buff2))
+			if (mysql_checkUser(id, buff2)) {
 				err_mess(hwnd, "Не подходит");
+				SendMessage(registrationForm_editPassword_HWND, EM_SETSEL, 0, -1);
+				SetFocus(registrationForm_editPassword_HWND);
+			}
 			else {
 				userID = id;
 				SendMessage(registrationForm_editLogin_HWND, CB_GETLBTEXT, i, userName);
@@ -1259,6 +1265,9 @@ LRESULT CALLBACK registrationForm_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 		case registrationForm_btnCancel_id:
 			SendMessage(mainWindow_HWND, WM_CLOSE, 0, 0);
 			break;
+		case registrationForm_editLogin_id:
+			if (HIWORD(wparam) == CBN_SELENDOK)
+				SetFocus(registrationForm_editPassword_HWND);
 		}
 		break;
 	}
