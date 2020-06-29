@@ -1242,9 +1242,15 @@ LRESULT CALLBACK registrationForm_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 		switch (LOWORD(wparam)) {
 		case registrationForm_btnOK_id:
 			*buff2 = 0;
-			SendMessage(registrationForm_editPassword_HWND, WM_GETTEXT, 20, buff2);
-			//err_mess(hwnd, itoc(SendMessage(registrationForm_editLogin_HWND, CB_GETCURSEL, 0, 0)));
 			i = SendMessage(registrationForm_editLogin_HWND, CB_GETCURSEL, 0, 0);
+			if (/*(!()) || */i == CB_ERR) {
+				err_mess(hwnd, "Выберите пользователя!");
+				//SendMessage(registrationForm_editPassword_HWND, EM_SETSEL, 0, -1);
+				SetFocus(registrationForm_editLogin_HWND);
+				break;
+			}
+			SendMessage(registrationForm_editPassword_HWND, WM_GETTEXT, 20, buff2);
+			
 			id = SendMessage(registrationForm_editLogin_HWND, CB_GETITEMDATA, i, 0);
 			if (mysql_checkUser(id, buff2)) {
 				err_mess(hwnd, "Не подходит");
