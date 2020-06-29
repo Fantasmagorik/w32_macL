@@ -4,7 +4,7 @@
 
 
 #include <Windows.h>
-#include <C:\m@x\w32_mac\mysql.h>
+#include <mysql.h>
 #include <stdlib.h>
 #include <CommCtrl.h>
 #include <WinUser.h>

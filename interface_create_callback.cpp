@@ -180,6 +180,7 @@ void OnCommand(hwnd, id, hwCtl, codeNotify) {
 		//err_mess(hwnd, "button click");;
 		SendMessage(groupDevice_combobox_HWND, WM_GETTEXT, 50, buff2);
 		SendMessage(deviceSelect_currentDevice_HWND, WM_SETTEXT, 0, buff2);
+		lastActiveWindow = hwnd;
 		ShowWindow(deviceSelect_HWND, SW_NORMAL);
 		EnableWindow(mainWindow_HWND, FALSE);
 		break; }
@@ -905,6 +906,7 @@ LRESULT CALLBACK deviceSelect_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 				err_mess(hwnd, "Выделите строку с устройством!");
 				break;
 			}
+			lastActiveWindow = hwnd;
 			showDeviceWindow(index);
 			//EnableWindow(deviceSelect_HWND, FALSE);
 		}
@@ -976,8 +978,10 @@ void enterCatch(HWND hwnd) {
 				SetFocus(groupDevice_combobox_HWND);
 				break;
 			case notSupportMac:
-				if (MessageBox(hwnd, "Для выбранного устройсва MAC адреса не предусмотрены. Вы можете изменить свойства в карточке устройства. Открыть сейчас?", "Неподходящее устройство", MB_ICONEXCLAMATION + MB_YESNO) == IDYES)
+				if (MessageBox(hwnd, "Для выбранного устройсва MAC адреса не предусмотрены. Вы можете изменить свойства в карточке устройства. Открыть сейчас?", "Неподходящее устройство", MB_ICONEXCLAMATION + MB_YESNO) == IDYES) {
+					lastActiveWindow = hwnd;
 					showDeviceWindow(device_ID);
+				}
 				break;
 			case alreadyUsed:
 				if (MessageBox(hwnd, "Данному серийному номеру уже присвоен MAC адрес. Подробная информация доступна в журнале. Открыть сейчас?", "S/N занят", MB_ICONEXCLAMATION + MB_YESNO) == IDYES) {
@@ -1059,12 +1063,10 @@ void showDeviceWindow(int id) {
 	SendMessage(deviceWindow_editGroup_HWND, WM_SETTEXT, 0, di->groupName);
 	SendMessage(deviceWindow_editMACCount_HWND, WM_SETTEXT, 0, itoc(di->MACCount));
 	//}
-
-	lastActiveWindow = GetActiveWindow();
 	ShowWindow(deviceWindow_HWND, TRUE);
 	SetFocus(deviceWindow_HWND);
-	EnableWindow(mainWindow_HWND, FALSE);
-	EnableWindow(deviceSelect_HWND, FALSE);
+	EnableWindow(lastActiveWindow, FALSE);
+	//EnableWindow(deviceSelect_HWND, FALSE);
 	//err_mess(GetActiveWindow(), "here");
 }
 
@@ -1092,9 +1094,10 @@ LRESULT CALLBACK deviceWindow_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lp
 		break; }
 	case WM_CLOSE: {
 		ShowWindow(deviceWindow_HWND, SW_HIDE);
-		EnableWindow(mainWindow_HWND, TRUE);
-		EnableWindow(deviceSelect_HWND, TRUE);
-		SetFocus(deviceSelect_HWND);
+		EnableWindow(lastActiveWindow, TRUE);
+		SetFocus(lastActiveWindow);
+		/*EnableWindow(deviceSelect_HWND, TRUE);
+		SetFocus(deviceSelect_HWND);*/
 		//SetFocus(mainWindow_HWND);
 		break; }
 	case WM_CREATE: {

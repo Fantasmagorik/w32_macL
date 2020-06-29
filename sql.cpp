@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include <C:\m@x\w32_mac\mysql.h>
+#include <mysql.h>
 #include <stdlib.h>
 #include <CommCtrl.h>
 #include <WinUser.h>
@@ -395,7 +395,7 @@ int mysql_conn() {
 			strcopy(status, itoc(limitConnect));
 			SendMessage(status_bar, SB_SETTEXT, 2, (LPARAM)status);
 			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, (unsigned int *)&timeout);
-			if (mysql_real_connect(&conn, "95.28.93.38"/*"192.168.8.152"*/, "plc_admin", "97SxFt6U", "test_mac", 3306, NULL, 0) != NULL) {
+			if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
 				break;
 			}
 		}
@@ -779,7 +779,7 @@ int mysql_getUsers() {
 	//char u_query[] = "select name, id, accesslevel, birthday from users;";
 	if (mysql_conn())
 		return;
-	if (mysql_query(&conn, "select name, id, accesslevel, birthday from users;") != 0)
+	if (mysql_query(&conn, "select name, id, accessLevel from users;") != 0)
 		return 1;
 	SendMessage(registrationForm_editLogin_HWND, CB_RESETCONTENT, 0, 0);
 	results = mysql_store_result(&conn);
