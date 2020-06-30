@@ -6,6 +6,8 @@
 #include "interface_create.h"
 //#include <string.h>
 
+
+
 //#define groupCount	200
 //#define itemCount	1000
 #define currentVersion	2
@@ -29,6 +31,7 @@ char listView_color = 0;
 
 void mysql_getDevices(void);
 int mysql_getUsers(void);
+extern int userID;
 
 int strlength(char *str) {
 	int i = 0;
@@ -253,7 +256,8 @@ int mysql_getAddress() {
 	//update request
 	const char insertStart[] = "UPDATE mac SET serial = \"",
 		insertProduct[] = "\", product = ",
-		insertEnd[] = ", id = last_insert_id(id) WHERE serial IS NULL ORDER BY id LIMIT 1; ";
+		insertUser[]	= ", user = ",
+		insertEnd[] = ", date = NOW(), id = last_insert_id(id) WHERE serial IS NULL ORDER BY id LIMIT 1; ";
 
 	dt = mysql_getDeviceInfo(itoc(device_ID), buff2);
 
@@ -281,9 +285,13 @@ int mysql_getAddress() {
 
 		//err_mess(GetActiveWindow(), buff2);
 		strcopy(query, buff2);
+		//product
 		strcopy(query, insertProduct);
-		//get mac
-		strcopy(query, itoc(device_ID)); //
+		strcopy(query, itoc(device_ID)); 
+		//user
+		strcopy(query, insertUser);
+		strcopy(query, itoc(userID));
+
 		strcopy(query, insertEnd);
 		mysql_query(&conn, query);
 
@@ -464,7 +472,7 @@ void mysql_getStatistic(int keyword, char *keyvalue) {
 	LVITEMW	 lvstr;
 	int i, x, offset;
 	char textBuffer[20];
-	const char statisticStart[] = "SELECT date, serial, mac, product.name, mac.id FROM  mac LEFT JOIN product ON product = product.id";
+	const char statisticStart[] = "SELECT date, serial, mac, product.name, mac.id, users.name FROM  mac LEFT JOIN product ON product = product.id LEFT JOIN users ON user = users.id";
 	const char q_cond[] = " WHERE ";
 
 	const char statisticSerial[] = "serial = \"";
@@ -527,12 +535,14 @@ void mysql_getStatistic(int keyword, char *keyvalue) {
 	i = 0;
 	*textBuffer = 0;
 	while (record = mysql_fetch_row(results)) {
+		lvstr.lParam = ctoi(record[4]);
 		lvstr.iItem = i;
 		lvstr.cchTextMax = 50;
-		lvstr.mask = LVIF_TEXT;
+		lvstr.mask = LVIF_TEXT + LVIF_PARAM;
 		lvstr.iSubItem = 0;
 		lvstr.pszText = itoc(i + 1);
 		SendMessage(groupView_list_HWND, LVM_INSERTITEM, 0, (LPARAM)(const LV_ITEM *)&lvstr);
+		lvstr.mask = LVIF_TEXT;
 		lvstr.iSubItem = 1;
 		lvstr.pszText = record[0];
 		SendMessage(groupView_list_HWND, LVM_SETITEM, 0, (LPARAM)(const LV_ITEM *)&lvstr);
@@ -548,8 +558,9 @@ void mysql_getStatistic(int keyword, char *keyvalue) {
 		lvstr.pszText = buff2;
 		SendMessage(groupView_list_HWND, LVM_SETITEMW, 0, (LPARAM)(LV_ITEM *)&lvstr);
 
+		
 		lvstr.iSubItem = 5;
-		lvstr.pszText = record[4];
+		lvstr.pszText = utf8_to_ASCII(record[5]);
 		SendMessage(groupView_list_HWND, LVM_SETITEM, 0, (LPARAM)(LV_ITEM *)&lvstr);
 		i++;
 	}

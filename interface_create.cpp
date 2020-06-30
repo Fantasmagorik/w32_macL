@@ -116,7 +116,7 @@ HWND groupMAC_create(HWND hParent) {
 	groupMAC_remember_HWND = CreateWindowEx(0, "button", "Копировать в буфер", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX + BS_LEFTTEXT, 30, 130, 180, 24, hwnd, groupMAC_remember_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
-	ti.hwnd = groupMAC_remember_HWND;
+	ti.hwnd = groupMAC_remember_HWND; 
 	ti.uId = 0;
 	ti.lpszText = "Каждая новая последовательность MAC для введенного серийного номера будет копироваться в буфер с символами переноса строки";
 	GetClientRect(groupMAC_remember_HWND, &ti.rect);
@@ -366,7 +366,7 @@ HWND groupView_create(HWND hParent) {
 	SendMessage(groupView_selectKeyWord_HWND, CB_ADDSTRING, 0, "Показать последние 1000 записей");
 	SendMessage(groupView_selectKeyWord_HWND, CB_SETCURSEL, 0, 0);
 
-	hwnd = CreateWindowEx(WS_EX_STATICEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE/* + WS_BORDER */ + LVS_REPORT /*+ LV_VIEW_DETAILS */ + LVS_SHOWSELALWAYS /*+ LVS_SINGLESEL*/, 30, 150, 720, 450, hParent, (HMENU)groupView_list_id, hinst, 0);
+	hwnd = CreateWindowEx(WS_EX_STATICEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE/* + WS_BORDER */ + LVS_REPORT /*+ LV_VIEW_DETAILS */ + LVS_SHOWSELALWAYS /*+ LVS_SINGLESEL*/, 10, 150, 750, 450, hParent, (HMENU)groupView_list_id, hinst, 0);
 	ListView_SetExtendedListViewStyle(hwnd, (ListView_GetExtendedListViewStyle(hwnd) | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES));
 
 	lv.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -396,12 +396,13 @@ HWND groupView_create(HWND hParent) {
 	lv.iSubItem = 4;
 	lv.pszText = "Устройство";
 	ListView_InsertColumn(hwnd, 4, &lv);
-	ListView_SetColumnWidth(hwnd, 4, LVSCW_AUTOSIZE_USEHEADER);
+	ListView_SetColumnWidth(hwnd, 4, 220);
+	
 
 	lv.iSubItem = 5;
-	lv.pszText = "mac_id";
+	lv.pszText = "Пользователь";
 	ListView_InsertColumn(hwnd, 5, &lv);
-	ListView_SetColumnWidth(hwnd, 5, 0);
+	ListView_SetColumnWidth(hwnd, 5, LVSCW_AUTOSIZE_USEHEADER);
 
 	return hwnd;
 }

@@ -450,7 +450,7 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case groupView_btnDelete_id: {
 			char deleteMac[200];
 			int lastIndex = -1, objectCount = 0, temp;
-			*deleteMac = 0;
+			*deleteMac = 0;	//collection of MACs for sql query
 			if (MessageBox(hwnd, "Данные будут удалены с сервера. Продолжить?", "Подтверждение удаления", MB_YESNO + MB_ICONINFORMATION) == IDYES)
 				do {
 					index = SendMessage(groupView_list_HWND, LVM_GETNEXTITEM, -1, LVNI_SELECTED);
@@ -458,16 +458,16 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 						//err_mess(0, "Выделите непустую строку!");
 						break;//modify it, do through GlobalAlloc,it will fix overflow
 					}
-					if (objectCount > 10) {
+					if (objectCount > 9) {
 						err_mess(hwnd, "В этой версии существует ограничение на количество одновременно изменяемых записей- не больше 10");
 						break;
 					}
 					if (objectCount)
 						strcopy(deleteMac, ",");
 					//err_mess(0, itoc(index));
-					lv.mask = LVIF_TEXT;
+					lv.mask = /*LVIF_TEXT + */LVIF_PARAM;
 					lv.iItem = index;
-					lv.iSubItem = 5;
+					//lv.iSubItem = 5;
 					lv.cchTextMax = 12;
 					*buff2 = 0;
 					lv.pszText = buff2;
@@ -477,7 +477,7 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 						return 0L;
 					}
 					lvf.flags = LVFI_PARAM;
-					lvf.lParam = ctoi(lv.pszText);// lv.pszText;
+					lvf.lParam = lv.lParam; //ctoi(lv.pszText);// lv.pszText;
 
 					temp = (SendMessage(groupHistory_list_HWND, LVM_FINDITEM, -1, &lvf));
 
@@ -486,7 +486,7 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 						SendMessage(groupHistory_list_HWND, LVM_DELETEITEM, temp, 0); //delete from History window
 
 					objectCount++;
-					strcopy(deleteMac, lv.pszText);
+					strcopy(deleteMac, itoc(lv.lParam));
 					lastIndex = index;
 				} while (1);
 
