@@ -32,6 +32,7 @@ char listView_color = 0;
 void mysql_getDevices(void);
 int mysql_getUsers(void);
 extern int userID;
+extern int userPriv;
 
 int strlength(char *str) {
 	int i = 0;
@@ -257,7 +258,7 @@ int mysql_getAddress() {
 	const char insertStart[] = "UPDATE mac SET serial = \"",
 		insertProduct[] = "\", product = ",
 		insertUser[]	= ", user = ",
-		insertEnd[] = ", date = NOW(), id = last_insert_id(id) WHERE serial IS NULL ORDER BY id LIMIT 1; ";
+		insertEnd[] = ", date = NOW(), id = last_insert_id(id) WHERE serial IS NULL AND deleteMark = 0 ORDER BY id LIMIT 1; ";
 
 	dt = mysql_getDeviceInfo(itoc(device_ID), buff2);
 
@@ -598,7 +599,7 @@ void mysql_getDevices(void) {
 	tvi.item.pszText = L"Все";
 	htrItem = SendMessage(deviceSelect_treeView_HWND, TVM_INSERTITEMW, 0, &tvi);
 
-	while (record = mysql_fetch_row(results)) {
+	while (record = mysql_fetch_row(results)) {		//Groups
 		//groupMap[i] = ctoi(record[0]);
 		tvi.hInsertAfter = TVI_LAST;
 		tvi.hParent = htrItem;
@@ -633,7 +634,7 @@ void mysql_getDevices(void) {
 			MultiByteToWideChar(CP_UTF8, 0, record[1], 120, buff2, 500);
 			SendMessageW(groupDevice_combobox_HWND, CB_ADDSTRING, 0, (LPARAM)buff2);
 			SendMessageW(groupView_comboDevice_HWND, CB_ADDSTRING, 0, (LPARAM)buff2);
-			//deviceMap[i] = ctoi(record[2]);
+			//deviceMap[i] = ctoi(record[2]);  
 
 			lvstr.iSubItem = 1; //lvstr.
 			MultiByteToWideChar(CP_UTF8, 0, record[1], 120, buff2, 500);

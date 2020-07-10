@@ -221,7 +221,7 @@ HWND groupHistory_create(HWND hParent) {
 	GetClientRect(groupHistory_btnDelete_HWND, &ti.rect);
 	SendMessage(toolTip_HWND, TTM_ADDTOOL, 0, &ti);
 
-	GroupHistory_selectGroup_HWND = CreateWindowEx(0, "button", "Выделять группой", /*BS_CENTER + BS_VCENTER + */ BS_RIGHTBUTTON + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 30, 10, 160, 25, hwnd, groupHistory_selectGroup_id, hinst, 0);
+	GroupHistory_selectGroup_HWND = CreateWindowEx(0, "button", "", /*BS_CENTER + BS_VCENTER + */ BS_RIGHTBUTTON + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 30, 10, 160, 25, hwnd, groupHistory_selectGroup_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
 	ti.hwnd = GroupHistory_selectGroup_HWND;
@@ -327,11 +327,11 @@ HWND groupView_create(HWND hParent) {
 	ti.uFlags = TTF_SUBCLASS;
 	ti.hwnd = groupView_btnDelete_HWND;
 	ti.uId = 0;
-	ti.lpszText = "Удалить выделенные записи";
+	ti.lpszText = "Пометить выделенные записи на удаление";
 	GetClientRect(groupView_btnDelete_HWND, &ti.rect);
 	SendMessage(toolTip_HWND, TTM_ADDTOOL, 0, &ti);
 
-	groupView_chkIsGroup_HWND = CreateWindowEx(0, "button", "Выделять группой", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 30, 90, 220, 25, hParent, groupView_chkIsGroup_id, hinst, 0);
+	groupView_chkIsGroup_HWND = CreateWindowEx(0, "button", "", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX, 30, 90, 220, 25, hParent, groupView_chkIsGroup_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
 	ti.hwnd = groupView_chkIsGroup_HWND;
@@ -422,7 +422,7 @@ HWND mainWindow_create() {
 	//const char className[] = "simple class";
 	wc.cbClsExtra = wc.cbWndExtra = NULL;
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.hbrBackground = /*BLACK_BRUSH;// /*COLOR_WINDOW;// */CreateSolidBrush(RGB(164, 176, 176));
+	wc.hbrBackground = /*BLACK_BRUSH;// /*COLOR_WINDOW;// */CreateSolidBrush(RGB(0, 99, 177));
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 	wc.hIcon = LoadIcon(hinst, ID_ICONMain);
 	wc.hIconSm = LoadIcon(0, ID_ICONMainSm);
@@ -449,7 +449,7 @@ int main(void) {
 
 	wc.cbClsExtra = wc.cbWndExtra = NULL;
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.hbrBackground = /*BLACK_BRUSH;//*/ COLOR_WINDOW;
+	wc.hbrBackground = /*BLACK_BRUSH;//*/ CreateSolidBrush(RGB(0, 99, 177));
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 	wc.hIcon = wc.hIconSm = NULL;
 	wc.hInstance = hinst;
@@ -552,7 +552,7 @@ HWND registrationForm_create(HWND hwnd) {
 	WNDCLASSEX wc;
 	wc.cbClsExtra = wc.cbWndExtra = NULL;
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.hbrBackground = /*BLACK_BRUSH;//*/ COLOR_WINDOW;
+	wc.hbrBackground = CreateSolidBrush(RGB(0, 99, 177));
 	wc.hCursor = LoadCursor(0, IDC_ARROW);
 	wc.hIcon = wc.hIconSm = NULL;
 	wc.hInstance = hinst;
@@ -563,5 +563,5 @@ HWND registrationForm_create(HWND hwnd) {
 	RegisterClassEx(&wc);//child window proto END
 	//hmenu = LoadMenu(hinst, MAKEINTRESOURCE(ID_MENU));
 
-	return CreateWindowEx(WS_EX_TOPMOST, wc.lpszClassName, "Авторизация", /*WS_CHILDWINDOW + */WS_VISIBLE + WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, 400, 250, 0, 0, hinst, 0);
+	return CreateWindowEx(WS_EX_TOPMOST, wc.lpszClassName, "Авторизация", /*WS_CHILDWINDOW + */WS_VISIBLE + WS_CAPTION, CW_USEDEFAULT, CW_USEDEFAULT, 400, 200, 0, 0, hinst, 0);
 }

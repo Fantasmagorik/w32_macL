@@ -242,7 +242,7 @@ void OnPaint(HWND hwnd) {
 
 }
 
-LRESULT OnNotify(HWND hwnd, int idFrom, NMHDR* nmhdr) {
+LRESULT OnNotify(HWND hwnd, int idFrom, NMHDR* nmhdr) { 
 
 	switch (idFrom) {
 	case groupHistory_list_id: //ListView
@@ -289,8 +289,8 @@ LRESULT CALLBACK groupWND_PROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		SelectObject(hdc, font);
 
 		hdc = BeginPaint(hwnd, &ps);
-		//SetBkColor(hdc, RGB(191, 205, 219));
-
+		SetBkColor(hdc, RGB(0, 99, 177));
+		SetTextColor(hdc, RGB(250, 250, 250));
 		if (hwnd == groupDevice_HWND) {
 			TextOut(hdc, 180, 0, "Устройство", 10);
 			/*SelectObject(hdc, font_regular);
@@ -308,16 +308,20 @@ LRESULT CALLBACK groupWND_PROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 		}
 		else if (hwnd == groupHistory_HWND) {
 			TextOut(hdc, 280, 0, "История сеанса", 14);
+			TextOut(hdc, 45, 13, "Выделять группой", 16);
 		}
-
+		/*else if (hwnd == GroupHistory_selectGroup_HWND) {
+			//SetTextColor(hdc, RGB(250, 250, 250)); 
+			TextOut(hdc, 380, 0, "Выделятьghg группой", 14);
+		}*/
 		EndPaint(hwnd, &ps);
 		DeleteObject(font);
 		break;
 	}
 	case WM_CTLCOLORSTATIC: {
 		//err_mess(hwnd, "here");
-		SetBkMode((HDC)wParam, TRANSPARENT);
-		SetTextColor((HDC)wParam, RGB(0, 0, 0));
+		SetBkMode((HDC)wParam, RGB(0, 178, 148));
+		SetTextColor((HDC)wParam, RGB(250, 250, 250));
 		return GetStockObject(NULL_BRUSH);
 		break; }
 							//CallWindowProc(groupDeviceOld_PROC, hwnd, msg, wparam, lparam);
@@ -334,6 +338,8 @@ LRESULT CALLBACK groupWND_PROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam
 LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 	LPCREATESTRUCT cs = lParam;
 	LPNMLVCUSTOMDRAW lp = lParam;
+	HDC hdc;
+	PAINTSTRUCT ps;
 	char tempBuffer[20];
 	LVITEM lv;
 	int index, keyword; 
@@ -392,6 +398,17 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 	//	}
 	//}
 	//				break;
+	case WM_PAINT:
+		if (hwnd == wrapWindow2_HWND) {
+			SelectObject(hdc, font);
+
+			hdc = BeginPaint(hwnd, &ps);
+			SetBkColor(hdc, RGB(0, 99, 177));
+			SetTextColor(hdc, RGB(250, 250, 250));
+
+			TextOut(hdc, 55, 94, "Выделять группой", 16); 
+			break;
+		}
 	case WM_COMMAND:
 		switch (LOWORD(wParam)) {
 		case groupView_btnSearch_id:
@@ -479,7 +496,7 @@ LRESULT CALLBACK wrapWindowPROC(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 					lvf.flags = LVFI_PARAM;
 					lvf.lParam = lv.lParam; //ctoi(lv.pszText);// lv.pszText;
 
-					temp = (SendMessage(groupHistory_list_HWND, LVM_FINDITEM, -1, &lvf));
+					temp = (SendMessage(groupHistory_list_HWND, LVM_FINDITEM, -1, &lvf)); 
 
 					SendMessage(groupView_list_HWND, LVM_DELETEITEM, index, 0); //delete from view window
 					if (temp != -1)
@@ -571,7 +588,7 @@ LRESULT CALLBACK mainWindowPROC(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 		//WrapWindow->Create
 		wc.cbClsExtra = wc.cbWndExtra;
 		wc.cbSize = sizeof(WNDCLASSEX);
-		wc.hbrBackground = /*CreateSolidBrush(RGB(164, 176, 176));//*/ COLOR_WINDOW; //BLACK_BRUSH;
+		wc.hbrBackground = CreateSolidBrush(RGB(0, 99, 177));//*/// COLOR_WINDOW; //BLACK_BRUSH;
 		wc.hCursor = LoadCursor(0, IDC_ARROW);
 		wc.hIcon = wc.hIconSm = NULL;
 		wc.hInstance = hinst;
@@ -1232,12 +1249,13 @@ LRESULT CALLBACK registrationForm_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 	switch (msg) {
 	case WM_SHOWWINDOW:
 		if (wparam == TRUE) {
-			EnableWindow(mainWindow_HWND, FALSE);
-			EnableWindow(wrapWindow1_HWND, FALSE);
-
+			//EnableWindow(mainWindow_HWND, FALSE);
 			SetFocus(registrationForm_editLogin_HWND);
+			//EnableWindow(wrapWindow1_HWND, FALSE);
+			ShowWindow(mainWindow_HWND, SW_HIDE);
+			
 		}
-		break;
+		break; 
 	case WM_COMMAND: {
 		switch (LOWORD(wparam)) {
 		case registrationForm_btnOK_id:
@@ -1286,19 +1304,29 @@ LRESULT CALLBACK registrationForm_PROC(HWND hwnd, UINT msg, WPARAM wparam, LPARA
 		registrationForm_editPassword_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", WS_CHILDWINDOW + WS_VISIBLE + ES_PASSWORD, 200, 65, 160, 21, hwnd, registrationForm_editPassword_id, hinst, 0);
 		registrationForm_btnEnterHWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Войти", WS_CHILDWINDOW + WS_VISIBLE, 260, 100, 100, 24, hwnd, registrationForm_btnOK_id, hinst, 0);
 		registrationForm_btnCancelHWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", "Выход", WS_CHILDWINDOW + WS_VISIBLE, 170, 100, 70, 24, hwnd, registrationForm_btnCancel_id, hinst, 0);
-		registrationForm_chkRemember_HWND = CreateWindowEx(0, "button", "Запомнить", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX + BS_LEFTTEXT, 25, 100, 100, 20, hwnd, registrationForm_chkRemember_id, hinst, 0);
-
+		registrationForm_chkRemember_HWND = CreateWindowEx(0, "button", "", BS_RIGHT + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX + BS_LEFTTEXT, 25, 100, 100, 20, hwnd, registrationForm_chkRemember_id, hinst, 0);
+		
 		break; }
 	case WM_PAINT: {
 		SelectObject(hdc, font_regular);
 		hdc = BeginPaint(hwnd, &ps);
+		SetBkColor(hdc, RGB(0, 99, 177));
+		SetTextColor(hdc, RGB(250, 250, 250));
 		TextOut(hdc, 30, 40, "Имя пользователя", 18);
 		TextOut(hdc, 30, 65, "Пароль", 7);
+		TextOut(hdc, 25, 100, "Запомнить", 9);
+		
 
 		EndPaint(hwnd, &ps);
 		DeleteObject(font);
 		break;
 	}
+	case WM_CTLCOLORSTATIC: {
+		//err_mess(hwnd, "here");
+		SetBkMode((HDC)wparam, RGB(0, 178, 148));
+		SetTextColor((HDC)wparam, RGB(250, 250, 250));
+		return GetStockObject(NULL_BRUSH);
+		break; }
 
 	case WM_CLOSE: {
 		if (!userID)
