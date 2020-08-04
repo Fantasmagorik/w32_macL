@@ -456,7 +456,7 @@ int main(void) {
 	wc.lpszClassName = groupClass;
 	wc.lpszMenuName = NULL;
 	wc.style = CS_HREDRAW + CS_VREDRAW;
-	wc.lpfnWndProc = groupWND_PROC;
+	wc.lpfnWndProc = groupWND_PROC; 
 	RegisterClassEx(&wc);//child window proto END
 	hmenu = LoadMenu(hinst, MAKEINTRESOURCE(ID_MENU));
 
