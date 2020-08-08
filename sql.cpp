@@ -20,7 +20,8 @@ char query[41000];
 char buff2[500], buff1[300];
 int groupCount, itemCount;
 //int deviceMap[700];// , tgroupMap[groupCount], tdeviceMap[700];
-unsigned int timeout = 2;
+//unsigned int timeout = 2;
+DWORD32 timeout = 3;
 struct groupLink groupData[200];
 struct groupLink itemData[1000];
 struct deviceData deviceInfo;
@@ -215,6 +216,9 @@ struct deviceData *mysql_getDeviceInfo(char *id, char *serial) {
 int mysql_getAddress() {
 	int i, x = 0, objectCount, serial, mac_id, bufferItemCount = 0;
 	struct deviceData *dt;
+	TV_INSERTSTRUCT tvi;
+	SYSTEMTIME st;
+	HTREEITEM htrItem;
 	LVITEMW	 lvstr;
 	HGLOBAL hg;
 	int limitMAC;
@@ -280,6 +284,35 @@ int mysql_getAddress() {
 	}
 
 	x = objectCount;
+	GetLocalTime(&st);
+	*buff1 = 0;/*
+	strcopy(buff1, itoc(st.wDay));
+	strcopy(buff1, ".");
+	strcopy(buff1, itoc(st.wMonth));
+	strcopy(buff1, "     ");
+	strcopy(buff1, itoc(st.wHour));
+	strcopy(buff1, ":");
+	strcopy(buff1, itoc(st.wMinute));
+	strcopy(buff1, ":");
+	strcopy(buff1, itoc(st.wSecond));*/
+	wsprintf(buff1, "%02d.%02d   %02d:%02d:%02d", st.wDay, st.wMonth, st.wHour, st.wMinute, st.wSecond);
+	tvi.hInsertAfter = TVI_FIRST;
+	tvi.hParent = TVI_ROOT;
+	tvi.item.mask = TVIF_TEXT;
+	tvi.item.cchTextMax = 140;
+	*query = 0;
+	strcopy(query, buff2);
+	strcopy(query, "     ");
+	strcopy(query, dt->deviceName);
+	strcopy(query, "     ");
+	strcopy(query, buff1);
+	//ASCII_to_utf8()
+
+
+	tvi.item.pszText = query;  //L"	-1-		2020.07.08.18:17:03		пнсреп 2Tx-2R-2LV	S/N 2400005278";
+	htrItem = SendMessage(groupHistory_list_HWND, TVM_INSERTITEM, 0, &tvi);
+	tvi.item.mask = TVIF_TEXT + TVIF_PARAM;
+	tvi.hInsertAfter = TVI_LAST;
 	while (x) {
 		*query = 0;
 		strcopy(query, insertStart);
@@ -319,7 +352,14 @@ int mysql_getAddress() {
 
 			*buff1 = 0;
 			/*HISTORY filling*/ {
+				
+				tvi.hParent = htrItem;
+				tvi.item.lParam = mac_id;
+				tvi.item.pszText = record[1];
+				SendMessage(groupHistory_list_HWND, TVM_INSERTITEM, 0, &tvi);
+
 				//ListView_SetBkColor(groupHistory_list_HWND, RGB(20, 100, 50));
+				/*
 				i = SendMessage(groupHistory_list_HWND, LVM_GETITEMCOUNT, 0, 0);		//add string in History
 				lvstr.mask = LVIF_TEXT + LVIF_PARAM;
 				lvstr.iItem = i;
@@ -348,6 +388,7 @@ int mysql_getAddress() {
 				lvstr.iSubItem = 5;
 				lvstr.pszText = itoc(mac_id);
 				SendMessage(groupHistory_list_HWND, LVM_SETITEM, 0, (LPARAM)(LV_ITEM *)&lvstr);
+				*/
 				if (ifCopy) {
 					strcopy(p_mem, record[1]); //copy to buffer
 					strcopy(p_mem, "\r\n");
@@ -403,7 +444,8 @@ int mysql_conn() {
 			strcopy(status, " ХГ ");
 			strcopy(status, itoc(limitConnect));
 			SendMessage(status_bar, SB_SETTEXT, 2, (LPARAM)status);
-			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, (unsigned int *)&timeout);
+			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
+			mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
 			if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
 				break;
 			}

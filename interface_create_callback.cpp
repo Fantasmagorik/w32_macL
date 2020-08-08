@@ -9,6 +9,9 @@
 #include <windowsx.h>
 #include "resource.h"
 
+
+void deleteMACInSession(void);
+
 #define offset_w	7
 extern struct groupLink groupData[200];
 extern struct groupLink itemData[700];
@@ -77,6 +80,44 @@ void copyToBuffer(HWND hwnd) {
 	strcopy(buff2, itoc(itemCount));
 	strcopy(buff2, " адрес(-ов) помещено в буфер");
 	SendMessage(status_bar, SB_SETTEXT, 0, (LPARAM)buff2);
+}
+
+void deleteMACInSession() {
+	char buff1[200];
+	int answer = 0;
+	HTREEITEM ht, htc;
+	TV_ITEM tv;
+	ht = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_CARET, ht);	//get handle of selected item
+	if (ht == NULL)
+		return 0;
+	*buff2 = 0;
+	tv.mask = TVIF_PARAM | TVIF_HANDLE | TVIF_CHILDREN ;
+	tv.pszText = buff1;
+	tv.cchTextMax = 70;
+	tv.hItem = ht;
+	tv.cChildren = 0;
+	tv.lParam = 0;
+
+	*buff2 = 0;
+	SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);
+	if (tv.cChildren != 0) {
+		strcopy(buff2, "ROOT  ");
+		do {
+			htc = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_CHILD, ht);
+			tv.mask = TVIF_HANDLE + TVIF_PARAM + TVIF_TEXT;
+			tv.hItem = htc;
+			answer = SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);
+			strcopy(buff2, tv.pszText);
+			strcopy(buff2, " (");
+			strcopy(buff2, itoc(tv.lParam));
+			strcopy(buff2, ")");
+			strcopy(buff2, ", ");
+
+		} while (answer);
+		err_mess(0, buff2);
+	}
+	else
+		err_mess(0, itoc(tv.lParam));
 }
 
 void deleteRecord(HWND hwnd) {
@@ -221,7 +262,8 @@ void OnCommand(hwnd, id, hwCtl, codeNotify) {
 		SetFocus(groupHistory_list_HWND);
 		break;
 	case groupHistory_btnDelete_id: {
-		deleteRecord(groupHistory_list_HWND);
+		//deleteRecord(groupHistory_list_HWND);
+		deleteMACInSession();
 
 		break;
 	}

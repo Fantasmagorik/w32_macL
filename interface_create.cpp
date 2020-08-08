@@ -150,13 +150,36 @@ HWND groupDevice_create(HWND hParent) {
 
 HWND groupHistory_create(HWND hParent) {
 	HWND hwnd;
+	TV_INSERTSTRUCT tvi;
+	HTREEITEM htrItem;
 	TOOLINFO ti;
 	unsigned int listView_style = 0;
 	LVCOLUMN lv;
 	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, groupClass, "История сеанса", BS_GROUPBOX + WS_CHILD + WS_BORDER + WS_VISIBLE + BS_CENTER, 30, 250, 880, 360, hParent, groupHistory_id, hinst, 0);
-	//ListView as TABLE
-	groupHistory_list_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE /*+ WS_BORDER + LV_VIEW_DETAILS */ + LVS_REPORT + LVS_SHOWSELALWAYS, 5, 40, 700, 325, hwnd, (HMENU)groupHistory_list_id, hinst, 0);
+	//ListView as TABLE/
+	
+	groupHistory_list_HWND = CreateWindowEx(WS_EX_STATICEDGE, WC_TREEVIEW, "обзор", WS_VISIBLE + WS_CHILD /*+ WS_BORDER */ + TVS_HASLINES + TVS_HASBUTTONS + TVS_LINESATROOT + TVS_SHOWSELALWAYS,
+		5, 40, 700, 325, hwnd, (HMENU)groupHistory_list_id, hinst, 0);
+
+	tvi.hInsertAfter = TVI_FIRST;
+	tvi.hParent = TVI_ROOT;
+	tvi.item.mask = TVIF_TEXT;
+	tvi.item.cchTextMax = 40;
+	tvi.item.pszText = L"	-1-		2020.07.08.18:17:03		РОУТЕР 2Tx-2R-2LV	S/N 2400005278";
+	htrItem = SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
+
+	tvi.hParent = htrItem;
+	tvi.item.mask = TVIF_TEXT;
+	tvi.item.cchTextMax = 140;
+	tvi.item.pszText = L"MAC 1:  9C:D3:32:00:F1:36";
+	SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
+	tvi.item.pszText = L"MAC 2:  9C:D3:32:00:F1:37";
+	SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
+
+
+	//groupHistory_list_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE /*+ WS_BORDER + LV_VIEW_DETAILS */ + LVS_REPORT + LVS_SHOWSELALWAYS, 5, 40, 700, 325, hwnd, (HMENU)groupHistory_list_id, hinst, 0);
 	//ListView_GetExtendedListViewStyle(groupHistory_list_HWND);
+	/*
 	ListView_SetExtendedListViewStyle(groupHistory_list_HWND, ListView_GetExtendedListViewStyle(groupHistory_list_HWND) | LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
 	lv.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -193,7 +216,7 @@ HWND groupHistory_create(HWND hParent) {
 	lv.pszText = "mac_id";
 	ListView_InsertColumn(groupHistory_list_HWND, 5, &lv);
 	ListView_SetColumnWidth(groupHistory_list_HWND, 5, 0);
-
+	*/
 	groupHistory_btnCopy_HWND = CreateWindowEx(WS_EX_STATICEDGE, "button", "Копировать", BS_CENTER + BS_VCENTER + WS_VISIBLE + BS_BITMAP + WS_CHILD/* + WS_BORDER*/, 600, 5, 35, 35, hwnd, groupHistory_btnCopy_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
