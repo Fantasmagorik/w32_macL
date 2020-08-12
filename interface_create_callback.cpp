@@ -84,41 +84,55 @@ void copyToBuffer(HWND hwnd) {
 
 void deleteMACInSession() {
 	char buff1[200];
-	int answer = 0;
+	int i= 0;
 	HTREEITEM ht, htc;
 	TV_ITEM tv;
 	ht = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_CARET, ht);	//get handle of selected item
 	if (ht == NULL)
 		return 0;
 	*buff2 = 0;
-	tv.mask = TVIF_PARAM | TVIF_HANDLE | TVIF_CHILDREN ;
+	tv.mask = TVIF_PARAM | TVIF_HANDLE | TVIF_CHILDREN;
 	tv.pszText = buff1;
 	tv.cchTextMax = 70;
 	tv.hItem = ht;
 	tv.cChildren = 0;
 	tv.lParam = 0;
-
 	*buff2 = 0;
 	SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);
-	if (tv.cChildren != 0) {
+	if (tv.cChildren != 0) {	//Item has a child item(`s)
 		strcopy(buff2, "ROOT  ");
+		htc = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_CHILD, ht);
+		tv.mask = TVIF_HANDLE + TVIF_PARAM + TVIF_TEXT;
+		tv.hItem = htc;
+		SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);	//got first child item
+		i = 0;
+		//tv.mask = TVIF_HANDLE + TVIF_PARAM + TVIF_TEXT;
 		do {
-			htc = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_CHILD, ht);
-			tv.mask = TVIF_HANDLE + TVIF_PARAM + TVIF_TEXT;
-			tv.hItem = htc;
-			answer = SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);
+			if (i != 0) {
+				i++;
+				tv.hItem = htc;
+				SendMessage(groupHistory_list_HWND, TVM_GETITEM, 0, &tv);
+			}
+			else
+			{
+				i = 1;
+			}
 			strcopy(buff2, tv.pszText);
 			strcopy(buff2, " (");
 			strcopy(buff2, itoc(tv.lParam));
 			strcopy(buff2, ")");
 			strcopy(buff2, ", ");
+			
+			
 
-		} while (answer);
+		} while (htc = SendMessage(groupHistory_list_HWND, TVM_GETNEXTITEM, TVGN_NEXT, htc));
+
+		strcopy(buff2, " всего записей: ");
+		strcopy(buff2, itoc(i));
 		err_mess(0, buff2);
 	}
-	else
-		err_mess(0, itoc(tv.lParam));
 }
+
 
 void deleteRecord(HWND hwnd) {
 	char deleteMac[200];

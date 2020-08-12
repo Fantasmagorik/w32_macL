@@ -446,7 +446,8 @@ int mysql_conn() {
 			SendMessage(status_bar, SB_SETTEXT, 2, (LPARAM)status);
 			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
 			mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
-			if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
+			//if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
+			if (mysql_real_connect(&conn, "127.0.0.1", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
 				break;
 			}
 		}
