@@ -102,7 +102,7 @@ HWND groupMAC_create(HWND hParent) {
 	TOOLINFO ti;
 	hwnd = CreateWindowEx(0, groupClass, "", BS_GROUPBOX + WS_CHILD /*+ WS_BORDER*/ + WS_VISIBLE + BS_CENTER, 1, 50, 400, 180, hParent, groupMAC_id, hinst, 0);
 	CreateWindowEx(WS_EX_TRANSPARENT, "static", "Серийный номер", SS_CENTER + WS_VISIBLE + WS_CHILD, 50, 40, 120, 24, hwnd, groupMAC_sSerial_id, hinst, 0);
-	CreateWindowEx(WS_EX_TRANSPARENT, "static", "MAC адрес:", SS_CENTER + WS_VISIBLE + WS_CHILD, 50, 88, 120, 24, hwnd, groupMAC_sMACAddress_id, hinst, 0);
+	
 	groupMAC_serial_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", ES_CENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/ + ES_WANTRETURN + ES_NUMBER, 200, 40, 130, 24, hwnd, groupMAC_serial_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
@@ -111,9 +111,8 @@ HWND groupMAC_create(HWND hParent) {
 	ti.lpszText = "Поле для ввода серийного номера";
 	GetClientRect(groupMAC_serial_HWND, &ti.rect);
 	SendMessage(toolTip_HWND, TTM_ADDTOOL, 0, &ti);
-	groupMAC_MACAddress_HWMD = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", ES_CENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER/*+ ES_READONLY*/, 200, 88, 130, 24, hwnd, groupMAC_MACAddress_id, hinst, 0);
-	groupMAC_getAddress_HWND = CreateWindowEx(WS_EX_STATICEDGE, "button", "Получить MAC", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/, 220, 130, 110, 24, hwnd, groupMAC_getAddress_id, hinst, 0);
 	groupMAC_remember_HWND = CreateWindowEx(0, "button", "Копировать в буфер", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD + BS_AUTOCHECKBOX + BS_LEFTTEXT, 30, 130, 180, 24, hwnd, groupMAC_remember_id, hinst, 0);
+	groupMAC_getAddress_HWND = CreateWindowEx(WS_EX_STATICEDGE, "button", "Получить MAC", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/, 220, 88, 110, 24, hwnd, groupMAC_getAddress_id, hinst, 0);
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
 	ti.hwnd = groupMAC_remember_HWND; 
@@ -131,7 +130,12 @@ HWND groupDevice_create(HWND hParent) {
 	TOOLINFO ti;
 	hwnd = CreateWindowEx(0, groupClass, "Устройство", WS_CHILD /*+ WS_BORDER*/ + WS_VISIBLE, 405, 50, 400, 180, hParent, groupDevice_id, hinst, 0);
 	groupDevice_combobox_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "combobox", "", WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/ + WS_VSCROLL + CBS_DROPDOWNLIST/*+ CBS_AUTOHSCROLL + CBS_DISABLENOSCROLL*/, 30, 40, 230, 224, hwnd, (HMENU)groupDevice_combobox_id, hinst, 0);
-	groupDevice_btnSelect_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", " ... ", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/, 270, 40, 50, 24, hwnd, groupDevice_btnSelect_id, hinst, 0);
+	groupDevice_btnSelect_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "button", " ... ", BS_CENTER + BS_VCENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER*/, 280, 40, 50, 24, hwnd, groupDevice_btnSelect_id, hinst, 0);
+	groupMAC_MACAddress_HWMD = CreateWindowEx(WS_EX_CLIENTEDGE, "edit", "", ES_CENTER + WS_VISIBLE + WS_CHILD /*+ WS_BORDER/*+ ES_READONLY*/, 30, 108, 230, 72, hwnd, groupMAC_MACAddress_id, hinst, 0);
+	CreateWindowEx(WS_EX_TRANSPARENT, "static", "MAC адрес:", SS_CENTER + WS_VISIBLE + WS_CHILD, 50, 88, 120, 24, hwnd, groupMAC_sMACAddress_id, hinst, 0);
+
+	SendMessage(groupMAC_MACAddress_HWMD, WM_SETTEXT, 0, "Something\n\r some");
+
 	SendMessage(groupDevice_combobox_HWND, WM_SETTEXT, 0, "Выберите устройство");
 	ti.cbSize = sizeof(TOOLINFO);
 	ti.uFlags = TTF_SUBCLASS;
@@ -151,15 +155,22 @@ HWND groupDevice_create(HWND hParent) {
 HWND groupHistory_create(HWND hParent) {
 	HWND hwnd;
 	TV_INSERTSTRUCT tvi;
-	HTREEITEM htrItem;
+	TVITEM tv;
+	HTREEITEM htrItem, child;
 	TOOLINFO ti;
 	unsigned int listView_style = 0;
 	LVCOLUMN lv;
+	DWORD dwStyle;
 	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, groupClass, "История сеанса", BS_GROUPBOX + WS_CHILD + WS_BORDER + WS_VISIBLE + BS_CENTER, 30, 250, 880, 360, hParent, groupHistory_id, hinst, 0);
 	//ListView as TABLE/
 	
 	groupHistory_list_HWND = CreateWindowEx(WS_EX_STATICEDGE, WC_TREEVIEW, "обзор", WS_VISIBLE + WS_CHILD /*+ WS_BORDER */ + TVS_HASLINES + TVS_HASBUTTONS + TVS_LINESATROOT + TVS_SHOWSELALWAYS,
 		5, 40, 700, 325, hwnd, (HMENU)groupHistory_list_id, hinst, 0);
+	//enable checkboxes
+	dwStyle = GetWindowLong(groupHistory_list_HWND, GWL_STYLE);
+	dwStyle |= TVS_CHECKBOXES;
+	SetWindowLong(groupHistory_list_HWND, GWL_STYLE, dwStyle);
+
 
 	tvi.hInsertAfter = TVI_FIRST;
 	tvi.hParent = TVI_ROOT;
@@ -169,12 +180,20 @@ HWND groupHistory_create(HWND hParent) {
 	htrItem = SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
 
 	tvi.hParent = htrItem;
-	tvi.item.mask = TVIF_TEXT;
+	tvi.item.mask = TVIF_TEXT | TVIF_STATE;
+	tvi.item.stateMask = TVIS_STATEIMAGEMASK;
+	tvi.item.state = 0;
 	tvi.item.cchTextMax = 140;
 	tvi.item.pszText = L"MAC 1:  9C:D3:32:00:F1:36";
-	SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
+	child = SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
 	tvi.item.pszText = L"MAC 2:  9C:D3:32:00:F1:37";
 	SendMessage(groupHistory_list_HWND, TVM_INSERTITEMW, 0, &tvi);
+
+	tv.hItem = child; // The item to be "set"/modified
+	tv.mask = TVIF_STATE;
+	tv.stateMask = TVIS_STATEIMAGEMASK;
+	tv.state = 0; // setting state to 0 again
+	TreeView_SetItem(groupHistory_list_HWND, &tv);
 
 
 	//groupHistory_list_HWND = CreateWindowEx(WS_EX_CLIENTEDGE, "SysListView32", "", WS_CHILD + WS_VISIBLE /*+ WS_BORDER + LV_VIEW_DETAILS */ + LVS_REPORT + LVS_SHOWSELALWAYS, 5, 40, 700, 325, hwnd, (HMENU)groupHistory_list_id, hinst, 0);

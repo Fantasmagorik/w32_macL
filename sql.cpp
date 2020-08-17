@@ -217,8 +217,9 @@ int mysql_getAddress() {
 	int i, x = 0, objectCount, serial, mac_id, bufferItemCount = 0;
 	struct deviceData *dt;
 	TV_INSERTSTRUCT tvi;
+	TVITEM tv;
 	SYSTEMTIME st;
-	HTREEITEM htrItem;
+	HTREEITEM htrItem, child;
 	LVITEMW	 lvstr;
 	HGLOBAL hg;
 	int limitMAC;
@@ -311,8 +312,10 @@ int mysql_getAddress() {
 
 	tvi.item.pszText = query;  //L"	-1-		2020.07.08.18:17:03		пнсреп 2Tx-2R-2LV	S/N 2400005278";
 	htrItem = SendMessage(groupHistory_list_HWND, TVM_INSERTITEM, 0, &tvi);
-	tvi.item.mask = TVIF_TEXT + TVIF_PARAM;
-	tvi.hInsertAfter = TVI_LAST;
+	tvi.item.mask =			TVIF_TEXT + TVIF_PARAM + TVIF_STATE;
+	tvi.item.stateMask =	TVIS_STATEIMAGEMASK;
+	tvi.item.state =		0;
+	tvi.hInsertAfter =		TVI_LAST;
 	while (x) {
 		*query = 0;
 		strcopy(query, insertStart);
@@ -356,7 +359,12 @@ int mysql_getAddress() {
 				tvi.hParent = htrItem;
 				tvi.item.lParam = mac_id;
 				tvi.item.pszText = record[1];
-				SendMessage(groupHistory_list_HWND, TVM_INSERTITEM, 0, &tvi);
+				child = SendMessage(groupHistory_list_HWND, TVM_INSERTITEM, 0, &tvi);
+				tv.hItem = child; // The item to be "set"/modified
+				tv.mask = TVIF_STATE;
+				tv.stateMask = TVIS_STATEIMAGEMASK;
+				tv.state = 0; // setting state to 0 again
+				TreeView_SetItem(groupHistory_list_HWND, &tv);
 
 				//ListView_SetBkColor(groupHistory_list_HWND, RGB(20, 100, 50));
 				/*
@@ -446,8 +454,8 @@ int mysql_conn() {
 			SendMessage(status_bar, SB_SETTEXT, 2, (LPARAM)status);
 			answer = mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
 			mysql_options(&conn, MYSQL_OPT_CONNECT_TIMEOUT, &timeout);
-			//if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
-			if (mysql_real_connect(&conn, "127.0.0.1", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
+			if (mysql_real_connect(&conn, "192.168.8.152", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
+			//if (mysql_real_connect(&conn, "127.0.0.1", "mac_admin", "98SxFt6U", "mac", 3306, NULL, 0) != NULL) {
 				break;
 			}
 		}
